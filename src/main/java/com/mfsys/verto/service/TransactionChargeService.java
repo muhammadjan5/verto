@@ -26,29 +26,21 @@ public class TransactionChargeService {
     // READ BY ID
     public TransactionChargeModel findById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Charge not found"));
-    }
-
-    // READ BY TRANSACTION ID
-    public List<TransactionChargeModel> findByTransactionId(Long transactionId) {
-        return repository.findByTransactionId(transactionId);
+                .orElseThrow(() -> new RuntimeException("Transaction charge not found"));
     }
 
     // UPDATE
     public TransactionChargeModel update(Long id, TransactionChargeModel charge) {
-        // Fetch existing entity
-        TransactionChargeModel existing = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Charge not found"));
+        TransactionChargeModel existing = findById(id);
 
-        // Update fields
-        existing.setTransactionId(charge.getTransactionId());
-        existing.setAmount(charge.getAmount());
-        existing.setChargeType(charge.getChargeType());
-        existing.setCurrency(charge.getCurrency());
-        existing.setDescription(charge.getDescription());
-        existing.setStatus(charge.getStatus());
+        existing.setPch_chrgcode(charge.getPch_chrgcode());
+        existing.setPch_chrgdesc(charge.getPch_chrgdesc());
+        existing.setPch_chrgprofit(charge.getPch_chrgprofit());
+        existing.setPch_chrgshort(charge.getPch_chrgshort());
+        existing.setPel_elmtcode(charge.getPel_elmtcode());
+        existing.setPtr_trancode(charge.getPtr_trancode());
+        existing.setSoc_charges(charge.getSoc_charges());
 
-        // Save back to DB
         return repository.save(existing);
     }
 

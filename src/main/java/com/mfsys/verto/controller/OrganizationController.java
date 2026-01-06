@@ -3,6 +3,7 @@ package com.mfsys.verto.controller;
 import com.mfsys.verto.model.OrganizationModel;
 import com.mfsys.verto.service.OrganizationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,33 +17,52 @@ public class OrganizationController {
 
     // CREATE
     @PostMapping("/create")
-    public OrganizationModel create(@RequestBody OrganizationModel organization) {
-        return organizationService.save(organization);
+    public ResponseEntity<OrganizationModel> createOrganization(@RequestBody OrganizationModel organization) {
+        OrganizationModel saved = organizationService.save(organization);
+        return ResponseEntity.ok(saved);
     }
 
     // READ ALL
     @GetMapping
-    public List<OrganizationModel> getAll() {
-        return organizationService.findAll();
+    public ResponseEntity<List<OrganizationModel>> getAllOrganizations() {
+        List<OrganizationModel> organizations = organizationService.findAll();
+        return ResponseEntity.ok(organizations);
     }
 
-    // READ BY CODE
-    @GetMapping("/{code}")
-    public OrganizationModel getByCode(@PathVariable("code") String code) {
-        return organizationService.findByCode(code);
+    // READ BY ID
+    @GetMapping("/{id}")
+    public ResponseEntity<OrganizationModel> getOrganizationById(@PathVariable Long id) {
+        OrganizationModel organization = organizationService.findById(id);
+        return ResponseEntity.ok(organization);
     }
 
-    // UPDATE
-    @PutMapping("/{code}")
-    public OrganizationModel update(
-            @PathVariable("code") String code,
+    // UPDATE BY ID
+    @PutMapping("/{id}")
+    public ResponseEntity<OrganizationModel> updateOrganization(
+            @PathVariable Long id,
             @RequestBody OrganizationModel organization) {
-        return organizationService.update(code, organization);
+        OrganizationModel updated = organizationService.update(id, organization);
+        return ResponseEntity.ok(updated);
     }
 
-    // DELETE
-    @DeleteMapping("/{code}")
-    public void delete(@PathVariable("code") String code) {
-        organizationService.delete(code);
+    // DELETE BY ID
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteOrganization(@PathVariable Long id) {
+        organizationService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+    //  NO EXISTING CODE CHANGED
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
+
+        if (ex.getMessage().equalsIgnoreCase("Data already exists")) {
+            return ResponseEntity.status(409).body("Data already exists");
+        }
+
+        if (ex.getMessage().equalsIgnoreCase("Data not found")) {
+            return ResponseEntity.status(404).body("Data not found");
+        }
+
+        return ResponseEntity.status(400).body(ex.getMessage());
     }
 }

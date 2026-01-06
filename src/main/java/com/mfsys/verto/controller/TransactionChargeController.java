@@ -30,18 +30,8 @@ public class TransactionChargeController {
 
     // READ BY ID
     @GetMapping("/{id}")
-    public ResponseEntity<TransactionChargeModel> getById(
-            @PathVariable Long id) {
+    public ResponseEntity<TransactionChargeModel> getById(@PathVariable Long id) {
         return ResponseEntity.ok(transactionChargeService.findById(id));
-    }
-
-    // READ BY TRANSACTION ID
-    @GetMapping("/transaction/{transactionId}")
-    public ResponseEntity<List<TransactionChargeModel>> getByTransactionId(
-            @PathVariable Long transactionId) {
-        return ResponseEntity.ok(
-                transactionChargeService.findByTransactionId(transactionId)
-        );
     }
 
     // UPDATE
@@ -49,9 +39,7 @@ public class TransactionChargeController {
     public ResponseEntity<TransactionChargeModel> update(
             @PathVariable Long id,
             @RequestBody TransactionChargeModel charge) {
-        return ResponseEntity.ok(
-                transactionChargeService.update(id, charge)
-        );
+        return ResponseEntity.ok(transactionChargeService.update(id, charge));
     }
 
     // DELETE

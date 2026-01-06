@@ -13,8 +13,11 @@ public class OrganizationService {
 
     private final OrganizationRepository organizationRepository;
 
-    // CREATE / SAVE
+    // CREATE
     public OrganizationModel save(OrganizationModel organization) {
+        if (organizationRepository.existsByCode(organization.getCode())) {
+            throw new RuntimeException("Data already exists");
+        }
         return organizationRepository.save(organization);
     }
 
@@ -23,26 +26,43 @@ public class OrganizationService {
         return organizationRepository.findAll();
     }
 
-    // READ BY CODE
-    public OrganizationModel findByCode(String porOrgacode) {
-        return organizationRepository.findById(porOrgacode)
-                .orElseThrow(() ->
-                        new RuntimeException("Organization not found with code: " + porOrgacode)
-                );
+    // READ BY ID
+    public OrganizationModel findById(Long id) {
+        return organizationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Data not found"));
     }
 
-    // UPDATE
-    public OrganizationModel update(String porOrgacode, OrganizationModel updatedOrg) {
-        OrganizationModel existing = findByCode(porOrgacode);
-        existing.setPorOrgaDesc(updatedOrg.getPorOrgaDesc());
+    // READ BY CODE
+    public OrganizationModel findByCode(String code) {
+        return organizationRepository.findByCode(code)
+                .orElseThrow(() -> new RuntimeException("Data not found"));
+    }
+
+    // UPDATE BY ID
+    public OrganizationModel update(Long id, OrganizationModel updatedOrg) {
+        OrganizationModel existing = findById(id);
+
+        if (updatedOrg.getCode() != null) {
+            // Check if new code is duplicate
+            if (!existing.getCode().equals(updatedOrg.getCode()) &&
+                    organizationRepository.existsByCode(updatedOrg.getCode())) {
+                throw new RuntimeException("Data already exists");
+            }
+            existing.setCode(updatedOrg.getCode());
+        }
+
+        if (updatedOrg.getName() != null) {
+            existing.setName(updatedOrg.getName());
+        }
+
         return organizationRepository.save(existing);
     }
 
-    // DELETE
-    public void delete(String porOrgacode) {
-        if (!organizationRepository.existsById(porOrgacode)) {
-            throw new RuntimeException("Organization not found with code: " + porOrgacode);
+    // DELETE BY ID
+    public void delete(Long id) {
+        if (!organizationRepository.existsById(id)) {
+            throw new RuntimeException("Data not found");
         }
-        organizationRepository.deleteById(porOrgacode);
+        organizationRepository.deleteById(id);
     }
 }
